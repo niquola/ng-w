@@ -30,17 +30,22 @@ angular
       newIndex = $scope.normalizeIndex($scope.activeIndex + d)
 
       if newIndex != $scope.activeIndex
+        delta = newIndex - $scope.activeIndex
+        $scope.activeIndex = newIndex
         if  newIndex < $scope.firstShown or $scope.lastShown() < newIndex
-          delta = newIndex - $scope.activeIndex
           $scope.firstShown =  $scope.normalizeIndex($scope.firstShown + delta)
           search($scope.prevSearch)
-        $scope.activeIndex = newIndex
-        $scope.activeItem = $scope.items[$scope.activeIndex]
+        else
+          $scope.activeItem = $scope.foundItems[$scope.activeIndex]
 
-    search = (q, dir) ->
-      # if $scope.prevSearch != q
-      $scope.shownItems = filter(q, $scope.items)[$scope.firstShown..$scope.lastShown()]
+    search = (q) ->
+      if $scope.prevSearch != q
+        $scope.activeIndex = 0
+        $scope.firstShown = 0
+        $scope.foundItems = filter(q, $scope.items)
+      $scope.shownItems = $scope.foundItems[$scope.firstShown..$scope.lastShown()]
       $scope.prevSearch = q
+      $scope.activeItem = $scope.foundItems[$scope.activeIndex]
 
     $scope.selection = (item)->
       $scope.selectedItem = $scope.activeItem = item
@@ -74,6 +79,7 @@ angular
     $scope.activeItem = $scope.items[0]
     # run
     search('')
+
 
   link: (scope, element, attrs, ngModelCtrl, transcludeFn) ->
     if ngModelCtrl
